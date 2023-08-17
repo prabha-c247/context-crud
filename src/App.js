@@ -1,24 +1,49 @@
-import logo from './logo.svg';
+/* eslint-disable react-hooks/exhaustive-deps */
 import './App.css';
+// import React  ,{createContext} from 'react';
+import React  ,{useEffect, useState} from 'react';
+import {BrowserRouter, Route, Routes} from 'react-router-dom'
+import Header from './components/Header';
+import AddUser from './components/AddUser';
+import EditUser from './components/EditUser';
+import GetUser from './components/GetUser';
+import './components/Style.css'
+import axios from 'axios';
+import UserContext from './context/UserContext'
 
-function App() {
+
+function App() {   
+  const [allUsers, setAllUsers] = useState([])
+ 
+  const getUsers=()=>{
+    axios.get('https://jsonplaceholder.typicode.com/posts')
+    .then((res)=>{
+      setAllUsers(res.data)
+      console.log(allUsers, 'value')
+    })
+    .catch((err)=>{console.log(err,'Error while fetching api')})
+  }
+
+  useEffect(()=>{
+    getUsers()   
+  },[])  
+
+   
+  // why this empty array showing warning after passing empty array
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserContext.Provider value={{allUsers,setAllUsers}}>
+    <BrowserRouter>
+     <Header/>
+
+        <Routes>
+          <Route path='/' element={<GetUser/>}/>
+          <Route path='/edit/:id' element={<EditUser/>}/>
+          <Route path='/addUser' element={<AddUser/>}/>         
+        </Routes>   
+    
+    </BrowserRouter>
+    </UserContext.Provider>
   );
 }
 
